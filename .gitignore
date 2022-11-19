@@ -135,4 +135,4 @@ dmypy.json
 *.db
 
 # Bot Token
-main.py
+*.json

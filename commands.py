@@ -19,7 +19,7 @@ async def verify_command(
 ) -> None:
     await interaction.response.defer(ephemeral=True)
 
-    embed = discord.Embed(title=f'Name: {name}', timestamp=discord.utils.utcnow())
+    embed = discord.Embed(title=f'Name: {name}', timestamp=discord.utils.utcnow(), color=0x2F3136)
     embed.set_author(
         name=str(interaction.user), icon_url=interaction.user.display_avatar.url
     )

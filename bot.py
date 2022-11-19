@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from constants import GUILD_ID
+from constants import GUILD_ID, TOKEN
 from database import Database
 
 
@@ -20,6 +20,9 @@ class Bot(Database, commands.Bot):
         intents.members = True
         intents.message_content = True
         super().__init__(command_prefix='sb!', intents=intents)
+
+    def standard_run(self) -> None:
+        self.run(TOKEN)
 
     async def setup_hook(self) -> None:
         await super().setup_hook()
