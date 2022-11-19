@@ -133,3 +133,6 @@ dmypy.json
 
 # sqlite
 *.db
+
+# Bot Token
+main.py
