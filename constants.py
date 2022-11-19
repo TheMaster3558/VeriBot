@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Final
 if TYPE_CHECKING:
     from typing_extensions import TypedDict
 
-
     class ConfigData(TypedDict):
         channel_id: int
         guild_id: int

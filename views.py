@@ -1,20 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import discord
 
-from constants import VERIFIED_ROLE_ID
+from constants import CHANNEL_ID, VERIFIED_ROLE_ID
 
 if TYPE_CHECKING:
     from typing_extensions import Self
     from bot import Bot
-
-
-def get_user_data(button: discord.ui.Button[VerificationView]) -> tuple[int, str]:
-    assert button.custom_id is not None
-    user_id, name = button.custom_id.split('_')
-    return int(user_id), name
 
 
 class ReasonModal(discord.ui.Modal, title='Rejection Reason'):
@@ -27,24 +21,33 @@ class ReasonModal(discord.ui.Modal, title='Rejection Reason'):
 
 
 class VerificationView(discord.ui.View):
-    def __init__(self, user: discord.abc.Snowflake, name: str) -> None:
+    def __init__(self, bot: Bot, user: discord.abc.Snowflake, name: str) -> None:
         super().__init__(timeout=None)
-        custom_id = f'{user.id}_{name}'
-        self.approve_button.custom_id = custom_id
-        self.reject_button.custom_id = custom_id
+        self.bot = bot
+        self.user = user
+        self.name = name
 
-    async def disable(self, message: discord.Message, approved: bool) -> None:
+    async def disable(self, message: discord.Message, approved: bool, reason: Optional[str] = None) -> None:
         embed = message.embeds[0]
         if approved:
             embed.color = discord.Color.green()
         else:
             embed.color = discord.Color.red()
 
+        if reason:
+            # `is not None` not used to check for empty string too
+            embed.add_field(name='Reason', value=reason)
+
         self.approve_button.disabled = True
         self.reject_button.disabled = True
-        await message.edit(embed=embed, view=self)
+        await message.edit(embed=embed, view=self, attachments=[])
 
-    @discord.ui.button(label='Approve', style=discord.ButtonStyle.green)
+        await self.bot.remove_message(message)
+        self.stop()
+
+    @discord.ui.button(
+        label='Approve', style=discord.ButtonStyle.green, custom_id='approve'
+    )
     async def approve_button(
         self, interaction: discord.Interaction, button: discord.ui.Button[Self]
     ) -> None:
@@ -54,14 +57,13 @@ class VerificationView(discord.ui.View):
 
         await interaction.response.defer()
 
-        user_id, name = get_user_data(button)
         try:
-            member = await bot.getch(interaction.guild.fetch_member, user_id)
+            member = await bot.getch(interaction.guild.fetch_member, self.user.id)
         except discord.NotFound:
             await interaction.followup.send('The user has left this server.')
         else:
-            await bot.insert_user(member, name)
-            await interaction.response.send_message(f'{member} has been approved.')
+            await bot.insert_user(member, self.name)
+            await interaction.followup.send(f'{member} has been approved.')
 
             embed = discord.Embed(
                 title='You have been verified',
@@ -76,7 +78,9 @@ class VerificationView(discord.ui.View):
 
         await self.disable(interaction.message, True)
 
-    @discord.ui.button(label='Reject', style=discord.ButtonStyle.red)
+    @discord.ui.button(
+        label='Reject', style=discord.ButtonStyle.red, custom_id='reject'
+    )
     async def reject_button(
         self, interaction: discord.Interaction, button: discord.ui.Button[Self]
     ) -> None:
@@ -88,9 +92,8 @@ class VerificationView(discord.ui.View):
         await interaction.response.send_modal(modal)
         await modal.wait()
 
-        user_id, _ = get_user_data(button)
         try:
-            member = await bot.getch(interaction.guild.fetch_member, user_id)
+            member = await bot.getch(interaction.guild.fetch_member, self.user.id)
         except discord.NotFound:
             await modal.interaction.response.send_message(
                 'The user has left the server.'
@@ -108,4 +111,19 @@ class VerificationView(discord.ui.View):
             embed.add_field(name='reason', value=modal.reason.value)
             await member.send(embed=embed)
 
-        await self.disable(interaction.message, False)
+        await self.disable(interaction.message, approved=False, reason=modal.reason.value)
+
+
+async def setup(bot: Bot) -> None:
+    channel = await bot.getch(bot.fetch_channel, CHANNEL_ID)
+    assert isinstance(channel, discord.TextChannel)
+
+    for message_id in await bot.get_messages():
+        message = await channel.fetch_message(message_id)
+        embed = message.embeds[0]
+
+        assert embed.title is not None and embed.footer.text is not None
+        name = embed.title.strip('Name: ')
+        user_id = embed.footer.text.strip('ID: ')
+        view = VerificationView(bot, discord.Object(id=user_id), name)
+        bot.add_view(view, message_id=message_id)

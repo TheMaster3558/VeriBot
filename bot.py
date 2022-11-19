@@ -18,18 +18,30 @@ class Bot(Database, commands.Bot):
     def __init__(self) -> None:
         intents = discord.Intents.default()
         intents.members = True
-        intents.message_content = True
-        super().__init__(command_prefix='sb!', intents=intents)
+        super().__init__(
+            command_prefix=commands.when_mentioned,
+            intents=intents,
+            owner_ids={475315771086602241, 739510612652195850},
+        )
 
     def standard_run(self) -> None:
         self.run(TOKEN)
 
     async def setup_hook(self) -> None:
         await super().setup_hook()
+        await self.load_extension('commands')
+        await self.load_extension('events')
+        await self.load_extension('views')
+        await self.load_extension('errors')
+        await self.load_extension('jishaku')
+        await self.load_extension('checks')
+
         self.app_commands = {
             cmd.name: cmd for cmd in await self.tree.sync(guild=self.test_guild)
         }
 
     async def getch(self, fetch: Callable[[int], Awaitable[R]], obj_id: int) -> R:
-        get = getattr(fetch.__self__, fetch.__name__.replace('fetch', 'get'))
+        get: Callable[[int], R] = getattr(
+            fetch.__self__, fetch.__name__.replace('fetch', 'get')
+        )
         return get(obj_id) or await fetch(obj_id)
