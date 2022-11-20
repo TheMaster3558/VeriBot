@@ -42,7 +42,8 @@ async def verify_command(
 
     view = VerificationView(bot, interaction.user, name)
 
-    channel = await bot.getch(bot.fetch_channel, CHANNEL_ID)
+    channel = await bot.getch(bot.get_channel, CHANNEL_ID)
+    reveal_type(channel)
     assert isinstance(channel, discord.TextChannel)
 
     data = await image.read()

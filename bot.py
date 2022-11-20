@@ -1,4 +1,4 @@
-from typing import Awaitable, Callable, Dict, TypeVar
+from typing import Awaitable, Callable, Dict, TypeVar, Optional
 
 import discord
 from discord import app_commands
@@ -40,8 +40,8 @@ class Bot(Database, commands.Bot):
             cmd.name: cmd for cmd in await self.tree.sync(guild=self.test_guild)
         }
 
-    async def getch(self, fetch: Callable[[int], Awaitable[R]], obj_id: int) -> R:
-        get: Callable[[int], R] = getattr(
-            fetch.__self__, fetch.__name__.replace('fetch', 'get')
+    async def getch(self, get: Callable[[int], Optional[R]], obj_id: int) -> R:
+        fetch: Callable[[int], Awaitable[R]] = getattr(
+            get.__self__, get.__name__.replace('get', 'fetch')
         )
         return get(obj_id) or await fetch(obj_id)

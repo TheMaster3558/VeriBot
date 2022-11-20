@@ -60,7 +60,7 @@ class VerificationView(discord.ui.View):
         await interaction.response.defer()
 
         try:
-            member = await bot.getch(interaction.guild.fetch_member, self.user.id)
+            member = await bot.getch(interaction.guild.get_member, self.user.id)
         except discord.NotFound:
             await interaction.followup.send('The user has left this server.')
         else:
@@ -95,7 +95,7 @@ class VerificationView(discord.ui.View):
         await modal.wait()
 
         try:
-            member = await bot.getch(interaction.guild.fetch_member, self.user.id)
+            member = await bot.getch(interaction.guild.get_member, self.user.id)
         except discord.NotFound:
             await modal.interaction.response.send_message(
                 'The user has left the server.'
@@ -119,7 +119,7 @@ class VerificationView(discord.ui.View):
 
 
 async def setup(bot: Bot) -> None:
-    channel = await bot.getch(bot.fetch_channel, CHANNEL_ID)
+    channel = await bot.getch(bot.get_channel, CHANNEL_ID)
     assert isinstance(channel, discord.TextChannel)
 
     for message_id in await bot.get_messages():
