@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from constants import GUILD_ID, TOKEN
+from constants import GUILD_ID
 from database import Database
 
 
@@ -23,9 +23,6 @@ class Bot(Database, commands.Bot):
             intents=intents,
             owner_ids={475315771086602241, 739510612652195850},
         )
-
-    def standard_run(self) -> None:
-        self.run(TOKEN)
 
     async def setup_hook(self) -> None:
         await super().setup_hook()

@@ -134,5 +134,6 @@ dmypy.json
 # sqlite
 *.db
 
-# Bot Token
+# Config + Token
 *.json
+main.py

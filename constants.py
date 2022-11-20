@@ -10,7 +10,6 @@ if TYPE_CHECKING:
         channel_id: int
         guild_id: int
         verified_role_id: int
-        token: str
 
 
 with open('config.json') as f:
@@ -19,4 +18,3 @@ with open('config.json') as f:
 CHANNEL_ID: Final[int] = data['channel_id']
 GUILD_ID: Final[int] = data['guild_id']
 VERIFIED_ROLE_ID: Final[int] = data['verified_role_id']
-TOKEN: Final[str] = data['token']
