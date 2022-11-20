@@ -66,7 +66,9 @@ async def whois_command(interaction: discord.Interaction, user: discord.Member) 
     name = await bot.get_name(user)
     if name is None:
         mention = bot.app_commands_dict['rename'].mention
-        await interaction.followup.send(f'That user could not be found. Use {mention} to add them.', ephemeral=True)
+        await interaction.followup.send(
+            f'That user could not be found. Use {mention} to add them.', ephemeral=True
+        )
     else:
         await interaction.followup.send(name, ephemeral=True)
 

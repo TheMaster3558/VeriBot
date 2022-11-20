@@ -27,7 +27,9 @@ class VerificationView(discord.ui.View):
         self.user = user
         self.name = name
 
-    async def disable(self, message: discord.Message, approved: bool, reason: Optional[str] = None) -> None:
+    async def disable(
+        self, message: discord.Message, approved: bool, reason: Optional[str] = None
+    ) -> None:
         embed = message.embeds[0]
         if approved:
             embed.color = discord.Color.green()
@@ -111,7 +113,9 @@ class VerificationView(discord.ui.View):
             embed.add_field(name='reason', value=modal.reason.value)
             await member.send(embed=embed)
 
-        await self.disable(interaction.message, approved=False, reason=modal.reason.value)
+        await self.disable(
+            interaction.message, approved=False, reason=modal.reason.value
+        )
 
 
 async def setup(bot: Bot) -> None:
