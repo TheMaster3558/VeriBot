@@ -46,7 +46,8 @@ Example
     bot = veribot.VeriBot(
         channel_id=881609972469866527,  # this is the channel you can accept/reject from,
         guild_id=878431847162466354,  # the id of the server the bot is being used in
-        verified_role_id=879147463020281907,  # the id of the role to add to users that have been verified
+        verified_role_id=879147463020281907  # the id of the role to add to users that have been verified
+    )
 
     bot.run('token')
 
