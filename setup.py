@@ -1,18 +1,24 @@
 import re
 from setuptools import setup
 
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
 
-with open('veribot/__init__.py') as f:
-    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
+with open('veribot/__init__.py', 'r') as f:
+    version = re.search(r'^__version__:\sFinal\[str]\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 
-with open('README.rst') as f:
+
+with open('README.rst', 'r') as f:
     readme = f.read()
 
 
 packages = [
     'veribot'
+]
+
+
+requirements = [
+    'aiosqlite',
+    'discord.py>=2.0',
+    'jishaku'
 ]
 
 
