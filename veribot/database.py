@@ -7,14 +7,12 @@ import discord
 class Database:
     conn: aiosqlite.Connection
 
-    async def setup_hook(self) -> None:
-        self.conn = await aiosqlite.connect('verification.db')
-        await self.init()
-
     async def close(self) -> None:
         await self.conn.close()
 
     async def init(self) -> None:
+        self.conn = await aiosqlite.connect('verification.db')
+
         async with self.conn.cursor() as cursor:
             await cursor.execute(
                 '''

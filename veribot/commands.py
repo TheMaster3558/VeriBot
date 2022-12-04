@@ -7,11 +7,11 @@ import aiosqlite
 import discord
 from discord import app_commands
 
-from constants import CHANNEL_ID, VERIFIED_ROLE_ID
-from views import VerificationView
+from . import __author__
+from .views import VerificationView
 
 if TYPE_CHECKING:
-    from bot import Bot
+    from .bot import VeriBot
 
 
 commands_list: List[str] = [
@@ -27,7 +27,7 @@ commands_list: List[str] = [
 async def verify_command(
     interaction: discord.Interaction, name: str, image: discord.Attachment
 ) -> None:
-    bot: Bot = interaction.client  # type: ignore
+    bot: VeriBot = interaction.client  # type: ignore
 
     await interaction.response.defer(ephemeral=True)
 
@@ -42,8 +42,7 @@ async def verify_command(
 
     view = VerificationView(bot, interaction.user, name)
 
-    channel = await bot.getch(bot.get_channel, CHANNEL_ID)
-    reveal_type(channel)
+    channel = await bot.getch(bot.get_channel, bot.config['channel_id'])
     assert isinstance(channel, discord.TextChannel)
 
     data = await image.read()
@@ -51,7 +50,7 @@ async def verify_command(
     file = discord.File(buffer, image.filename)
 
     message = await channel.send(embed=embed, file=file, view=view)
-    await bot.insert_message(message)
+    await bot.db.insert_message(message)
     await interaction.followup.send('Your verification has been sent.')
 
 
@@ -61,10 +60,10 @@ async def verify_command(
 @app_commands.describe(user='The user to check')
 @app_commands.default_permissions(administrator=True)
 async def whois_command(interaction: discord.Interaction, user: discord.Member) -> None:
-    bot: Bot = interaction.client  # type: ignore
+    bot: VeriBot = interaction.client  # type: ignore
 
     await interaction.response.defer(ephemeral=True)
-    name = await bot.get_name(user)
+    name = await bot.db.get_name(user)
     if name is None:
         mention = bot.app_commands_dict['rename'].mention
         await interaction.followup.send(
@@ -80,14 +79,14 @@ async def whois_command(interaction: discord.Interaction, user: discord.Member) 
 async def rename_command(
     interaction: discord.Interaction, user: discord.Member, new_name: str
 ) -> None:
-    bot: Bot = interaction.client  # type: ignore
+    bot: VeriBot = interaction.client  # type: ignore
 
     await interaction.response.defer(ephemeral=True)
     try:
-        await bot.remove_user(user)
+        await bot.db.remove_user(user)
     except aiosqlite.OperationalError:
         pass
-    await bot.insert_user(user, new_name)
+    await bot.db.insert_user(user, new_name)
     await interaction.followup.send(
         f'{user}\'s new name is {new_name}.', ephemeral=True
     )
@@ -100,24 +99,37 @@ async def unverify_command(
     interaction: discord.Interaction, user: discord.Member
 ) -> None:
     assert interaction.guild is not None
-    bot: Bot = interaction.client  # type: ignore
+    bot: VeriBot = interaction.client  # type: ignore
 
     await interaction.response.defer(ephemeral=True)
     try:
-        await bot.remove_user(user)
+        await bot.db.remove_user(user)
     except aiosqlite.OperationalError:
         await interaction.followup.send('That user was never verified.', ephemeral=True)
     else:
         await interaction.followup.send(f'The {user} was unverified.', ephemeral=True)
 
-    role = interaction.guild.get_role(VERIFIED_ROLE_ID)
+    role = interaction.guild.get_role(bot.config['verified_role_id'])
     assert role is not None
 
     if role in user.roles:
         await user.remove_roles(role)
 
 
-async def setup(bot: Bot) -> None:
+@app_commands.command(name='info', description='Info about the bot')
+async def info_command(interaction: discord.Interaction) -> None:
+    embed = discord.Embed(
+        title=interaction.client.user.name,
+        description=f'{interaction.client.user} is an instance of [VeriBot](https://github.com/TheMaster3558/VeriBot). VeriBot is an open source verification bot created by {__author__}.',
+    )
+    embed.add_field(
+        name='Bot Created',
+        value=discord.utils.format_dt(interaction.client.user.created_at, style='R'),
+    )
+    embed.set_thumbnail(url=interaction.client.user.display_avatar.url)
+
+
+async def setup(bot: VeriBot) -> None:
     for command_name in commands_list:
         command = globals()[command_name]
         bot.tree.add_command(command)

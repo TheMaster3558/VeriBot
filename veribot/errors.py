@@ -10,15 +10,15 @@ from discord import app_commands
 from discord.ext import commands
 
 if TYPE_CHECKING:
-    from bot import Bot
+    from .bot import VeriBot
 
 
-async def get_owners(bot: Bot) -> List[discord.abc.Messageable]:
+async def get_owners(bot: VeriBot) -> List[discord.abc.Messageable]:
     assert bot.owner_ids is not None
     return [await bot.fetch_user(user_id) for user_id in bot.owner_ids]
 
 
-async def report_error(bot: Bot, error: Exception) -> None:
+async def report_error(bot: VeriBot, error: Exception) -> None:
     formatted = '\n'.join(
         traceback.format_exception(error.__class__, error, error.__traceback__)
     )
@@ -38,14 +38,14 @@ async def report_error(bot: Bot, error: Exception) -> None:
 async def interactions_error_handler(
     interaction: discord.Interaction, error: app_commands.AppCommandError
 ) -> None:
-    bot: Bot = interaction.client  # type: ignore
+    bot: VeriBot = interaction.client  # type: ignore
     assert bot.application is not None
 
     await report_error(bot, error)
 
 
 async def commands_error_handler(
-    ctx: commands.Context[Bot], error: commands.CommandError
+    ctx: commands.Context[VeriBot], error: commands.CommandError
 ) -> None:
     if isinstance(error, commands.NotOwner):
         await ctx.send(error.args[0])
@@ -53,6 +53,6 @@ async def commands_error_handler(
         await report_error(ctx.bot, error)
 
 
-async def setup(bot: Bot) -> None:
+async def setup(bot: VeriBot) -> None:
     bot.tree.error(interactions_error_handler)
     bot.add_listener(commands_error_handler, 'on_command_error')

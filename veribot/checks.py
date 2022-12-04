@@ -7,10 +7,10 @@ import discord
 from discord.ext import commands
 
 if TYPE_CHECKING:
-    from bot import Bot
+    from .bot import VeriBot
 
 
-async def jsk_check(self: jishaku.Feature, ctx: commands.Context[Bot]) -> bool:
+async def jsk_check(self: jishaku.Feature, ctx: commands.Context[VeriBot]) -> bool:
     if not await ctx.bot.is_owner(ctx.author) and (
         isinstance(ctx.author, discord.Member)
         and not ctx.author.guild_permissions.administrator
@@ -19,5 +19,5 @@ async def jsk_check(self: jishaku.Feature, ctx: commands.Context[Bot]) -> bool:
     return True
 
 
-async def setup(bot: Bot) -> None:
+async def setup(bot: VeriBot) -> None:
     jishaku.Feature.cog_check = jsk_check  # type: ignore

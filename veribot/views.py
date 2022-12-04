@@ -4,11 +4,9 @@ from typing import TYPE_CHECKING, Optional
 
 import discord
 
-from constants import CHANNEL_ID, VERIFIED_ROLE_ID
-
 if TYPE_CHECKING:
     from typing_extensions import Self
-    from bot import Bot
+    from .bot import VeriBot
 
 
 class ReasonModal(discord.ui.Modal, title='Rejection Reason'):
@@ -21,7 +19,7 @@ class ReasonModal(discord.ui.Modal, title='Rejection Reason'):
 
 
 class VerificationView(discord.ui.View):
-    def __init__(self, bot: Bot, user: discord.abc.Snowflake, name: str) -> None:
+    def __init__(self, bot: VeriBot, user: discord.abc.Snowflake, name: str) -> None:
         super().__init__(timeout=None)
         self.bot = bot
         self.user = user
@@ -44,7 +42,7 @@ class VerificationView(discord.ui.View):
         self.reject_button.disabled = True
         await message.edit(embed=embed, view=self, attachments=[])
 
-        await self.bot.remove_message(message)
+        await self.bot.db.remove_message(message)
         self.stop()
 
     @discord.ui.button(
@@ -55,7 +53,7 @@ class VerificationView(discord.ui.View):
     ) -> None:
         assert interaction.message is not None
         assert interaction.guild is not None
-        bot: Bot = interaction.client  # type: ignore
+        bot: VeriBot = interaction.client  # type: ignore
 
         await interaction.response.defer()
 
@@ -64,7 +62,7 @@ class VerificationView(discord.ui.View):
         except discord.NotFound:
             await interaction.followup.send('The user has left this server.')
         else:
-            await bot.insert_user(member, self.name)
+            await bot.db.insert_user(member, self.name)
             await interaction.followup.send(f'{member} has been approved.')
 
             embed = discord.Embed(
@@ -74,7 +72,7 @@ class VerificationView(discord.ui.View):
             )
             await member.send(embed=embed)
 
-            role = interaction.guild.get_role(VERIFIED_ROLE_ID)
+            role = interaction.guild.get_role(bot.config['verified_role_id'])
             assert role is not None
             await member.add_roles(role)
 
@@ -88,7 +86,7 @@ class VerificationView(discord.ui.View):
     ) -> None:
         assert interaction.message is not None
         assert interaction.guild is not None
-        bot: Bot = interaction.client  # type: ignore
+        bot: VeriBot = interaction.client  # type: ignore
 
         modal = ReasonModal()
         await interaction.response.send_modal(modal)
@@ -118,11 +116,11 @@ class VerificationView(discord.ui.View):
         )
 
 
-async def setup(bot: Bot) -> None:
-    channel = await bot.getch(bot.get_channel, CHANNEL_ID)
+async def setup(bot: VeriBot) -> None:
+    channel = await bot.getch(bot.get_channel, bot.config['channel_id'])
     assert isinstance(channel, discord.TextChannel)
 
-    for message_id in await bot.get_messages():
+    for message_id in await bot.db.get_messages():
         message = await channel.fetch_message(message_id)
         embed = message.embeds[0]
 
