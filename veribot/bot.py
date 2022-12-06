@@ -48,6 +48,7 @@ class VeriBot(commands.Bot):
         await self.load_extension('jishaku')
 
         test_guild = discord.Object(id=self.guild_id)
+        self.tree.copy_global_to(guild=test_guild)
         self.app_commands_dict = {
             cmd.name: cmd for cmd in await self.tree.sync(guild=test_guild)
         }
