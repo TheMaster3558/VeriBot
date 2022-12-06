@@ -5,11 +5,11 @@ import discord
 
 
 class Database:
-    conn: aiosqlite.Connection
+    def __init__(self):
+        self.conn = aiosqlite.connect('verification.db')
 
     async def init(self) -> None:
-        self.conn = await aiosqlite.connect('verification.db')
-
+        await self.conn
         async with self.conn.cursor() as cursor:
             await cursor.execute(
                 '''
