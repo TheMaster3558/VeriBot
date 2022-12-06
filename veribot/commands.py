@@ -42,7 +42,7 @@ async def verify_command(
 
     view = VerificationView(bot, interaction.user, name)
 
-    channel = await bot.getch(bot.get_channel, bot.config['channel_id'])
+    channel = await bot.getch(bot.get_channel, bot.channel_id)
     assert isinstance(channel, discord.TextChannel)
 
     data = await image.read()
@@ -109,7 +109,7 @@ async def unverify_command(
     else:
         await interaction.followup.send(f'The {user} was unverified.', ephemeral=True)
 
-    role = interaction.guild.get_role(bot.config['verified_role_id'])
+    role = interaction.guild.get_role(bot.verified_role_id)
     assert role is not None
 
     if role in user.roles:

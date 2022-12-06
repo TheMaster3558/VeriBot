@@ -72,7 +72,7 @@ class VerificationView(discord.ui.View):
             )
             await member.send(embed=embed)
 
-            role = interaction.guild.get_role(bot.config['verified_role_id'])
+            role = interaction.guild.get_role(bot.verified_role_id)
             assert role is not None
             await member.add_roles(role)
 
@@ -117,7 +117,7 @@ class VerificationView(discord.ui.View):
 
 
 async def setup(bot: VeriBot) -> None:
-    channel = await bot.getch(bot.get_channel, bot.config['channel_id'])
+    channel = await bot.getch(bot.get_channel, bot.channel_id)
     assert isinstance(channel, discord.TextChannel)
 
     for message_id in await bot.db.get_messages():

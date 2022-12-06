@@ -7,9 +7,6 @@ import discord
 class Database:
     conn: aiosqlite.Connection
 
-    async def close(self) -> None:
-        await self.conn.close()
-
     async def init(self) -> None:
         self.conn = await aiosqlite.connect('verification.db')
 
@@ -25,6 +22,9 @@ class Database:
                 '''
             )
         await self.conn.commit()
+
+    async def close(self) -> None:
+        await self.conn.close()
 
     async def insert_user(self, user: discord.abc.Snowflake, name: str) -> None:
         async with self.conn.cursor() as cursor:

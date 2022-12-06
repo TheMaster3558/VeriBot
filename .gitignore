@@ -135,5 +135,4 @@ dmypy.json
 *.db
 
 # Config + Token
-*.json
 main.py

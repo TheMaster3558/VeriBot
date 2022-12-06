@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 async def setup(bot: VeriBot) -> None:
     @bot.listen()
     async def on_member_join(member: discord.Member) -> None:
-        role = member.guild.get_role(bot.config['verified_role_id'])
+        role = member.guild.get_role(bot.verified_role_id)
         assert role is not None
 
         name = await bot.db.get_name(member)

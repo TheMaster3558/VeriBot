@@ -3,23 +3,19 @@ from setuptools import setup
 
 
 with open('veribot/__init__.py', 'r') as f:
-    version = re.search(r'^__version__:\sFinal\[str]\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
+    version = re.search(
+        r'^__version__:\sFinal\[str]\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
+    ).group(1)
 
 
 with open('README.rst', 'r') as f:
     readme = f.read()
 
 
-packages = [
-    'veribot'
-]
+packages = ['veribot']
 
 
-requirements = [
-    'aiosqlite',
-    'discord.py>=2.0',
-    'jishaku'
-]
+requirements = ['aiosqlite', 'discord.py>=2.0', 'jishaku']
 
 
 setup(
@@ -27,9 +23,7 @@ setup(
     author='The Master',
     license='MIT',
     url='https://github.com/TheMaster3558/veribot',
-    project_urls={
-        'GitHub': 'https://github.com/TheMaster3558/veribot'
-    },
+    project_urls={'GitHub': 'https://github.com/TheMaster3558/veribot'},
     version=version,
     packages=packages,
     description='VeriBot is a bot that can be used for verification.',
@@ -51,5 +45,5 @@ setup(
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Typing :: Typed',
-      ]
+    ],
 )
