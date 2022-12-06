@@ -10,7 +10,7 @@ __title__: Final[str] = 'veribot'
 __author__: Final[str] = 'The Master'
 __license__: Final[str] = 'MIT'
 __copyright__: Final[str] = 'Copyright 2022-present The Master'
-__version__: Final[str] = '1.0.2'
+__version__: Final[str] = '1.0.3'
 
 
 from .bot import VeriBot

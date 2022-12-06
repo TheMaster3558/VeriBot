@@ -40,12 +40,12 @@ class VeriBot(commands.Bot):
     async def setup_hook(self) -> None:
         await self.db.init()
 
-        await self.load_extension('commands')
-        await self.load_extension('events')
-        await self.load_extension('views')
-        await self.load_extension('errors')
+        await self.load_extension('veribot.commands')
+        await self.load_extension('veribot.events')
+        await self.load_extension('veribot.views')
+        await self.load_extension('veribot.errors')
+        await self.load_extension('veribot.checks')
         await self.load_extension('jishaku')
-        await self.load_extension('checks')
 
         test_guild = discord.Object(id=self.guild_id)
         self.app_commands_dict = {
