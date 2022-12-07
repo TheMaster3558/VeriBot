@@ -122,6 +122,6 @@ async def info_command(interaction: discord.Interaction) -> None:
 
 
 async def setup(bot: VeriBot) -> None:
-    for obj in globals():
+    for obj in globals().values():
         if isinstance(obj, app_commands.Command):
             bot.tree.add_command(obj)
