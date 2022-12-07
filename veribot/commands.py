@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import io
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 import aiosqlite
 import discord
@@ -12,14 +12,6 @@ from .views import VerificationView
 
 if TYPE_CHECKING:
     from .bot import VeriBot
-
-
-commands_list: List[str] = [
-    'verify_command',
-    'whois_command',
-    'rename_command',
-    'unverify_command',
-]
 
 
 @app_commands.command(name='verify', description='Verify yourself')
@@ -130,6 +122,6 @@ async def info_command(interaction: discord.Interaction) -> None:
 
 
 async def setup(bot: VeriBot) -> None:
-    for command_name in commands_list:
-        command = globals()[command_name]
-        bot.tree.add_command(command)
+    for obj in globals():
+        if isinstance(obj, app_commands.Command):
+            bot.tree.add_command(obj)
