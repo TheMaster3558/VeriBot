@@ -119,6 +119,7 @@ async def info_command(interaction: discord.Interaction) -> None:
         value=discord.utils.format_dt(interaction.client.user.created_at, style='R'),
     )
     embed.set_thumbnail(url=interaction.client.user.display_avatar.url)
+    await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot: VeriBot) -> None:
