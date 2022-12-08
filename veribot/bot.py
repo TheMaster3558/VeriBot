@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Awaitable, Callable, Dict, TypeVar, Optional
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, TypeVar, Optional
 
 import discord
 from discord import app_commands
@@ -8,12 +8,16 @@ from discord.ext import commands
 
 from .database import Database
 
+if TYPE_CHECKING:
+    import datetime
+
 
 R = TypeVar('R', bound=discord.abc.Snowflake)
 
 
 class VeriBot(commands.Bot):
     app_commands_dict: Dict[str, app_commands.AppCommand]
+    startup_time: datetime.datetime
 
     def __init__(
         self,
@@ -52,6 +56,8 @@ class VeriBot(commands.Bot):
         self.app_commands_dict = {
             cmd.name: cmd for cmd in await self.tree.sync(guild=test_guild)
         }
+
+        self.startup_time = discord.utils.utcnow()
 
     async def close(self) -> None:
         await self.db.close()
