@@ -111,14 +111,15 @@ async def unverify_command(
 @app_commands.command(name='info', description='Info about the bot')
 async def info_command(interaction: discord.Interaction) -> None:
     bot: VeriBot = interaction.client  # type: ignore
+    assert bot.user is not None
 
     embed = discord.Embed(
-        title=interaction.client.user.name,
+        title=bot.user.name,
         description=f'{interaction.client.user} is an instance of [VeriBot](https://github.com/TheMaster3558/VeriBot). VeriBot is an open source verification bot created by {__author__}.',
     )
     embed.add_field(
         name='Bot Created',
-        value=discord.utils.format_dt(interaction.client.user.created_at, style='R'),
+        value=discord.utils.format_dt(bot.user.created_at, style='R'),
     )
 
     uptime = discord.utils.utcnow() - bot.startup_time
@@ -130,7 +131,7 @@ async def info_command(interaction: discord.Interaction) -> None:
         value=f'{uptime.days} days, {hours} hours, {minutes} minutes, {seconds} seconds'
     )
 
-    embed.set_thumbnail(url=interaction.client.user.display_avatar.url)
+    embed.set_thumbnail(url=bot.user.display_avatar.url)
     await interaction.response.send_message(embed=embed)
 
 

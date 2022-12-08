@@ -20,6 +20,8 @@ async def init_file() -> None:
 
 
 async def read_file(bot: VeriBot) -> List[Dict[str, Any]]:
+    assert bot.user is not None
+
     async with aiofiles.open('veribot/last_sync.json', 'r') as file:
         text = await file.read()
 
@@ -28,10 +30,13 @@ async def read_file(bot: VeriBot) -> List[Dict[str, Any]]:
     except json.JSONDecodeError:
         await init_file()
         return await read_file(bot)
+
     return data.get(str(bot.user.id), [])
 
 
 async def write_file(bot: VeriBot) -> None:
+    assert bot.user is not None
+
     async with aiofiles.open('veribot/last_sync.json', 'r') as file:
         text = await file.read()
 
