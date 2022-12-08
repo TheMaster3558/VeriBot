@@ -1,3 +1,4 @@
+aiofiles
 aiosqlite
 discord.py>=2.0
 jishaku

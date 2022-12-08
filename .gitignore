@@ -136,3 +136,6 @@ dmypy.json
 
 # Config + Token
 main.py
+
+# App Command Syncing
+*.json

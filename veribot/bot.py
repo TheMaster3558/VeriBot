@@ -46,16 +46,11 @@ class VeriBot(commands.Bot):
 
         await self.load_extension('veribot.commands')
         await self.load_extension('veribot.events')
+        await self.load_extension('veribot.last_sync')
         await self.load_extension('veribot.views')
         await self.load_extension('veribot.errors')
         await self.load_extension('veribot.checks')
         await self.load_extension('jishaku')
-
-        test_guild = discord.Object(id=self.guild_id)
-        self.tree.copy_global_to(guild=test_guild)
-        self.app_commands_dict = {
-            cmd.name: cmd for cmd in await self.tree.sync(guild=test_guild)
-        }
 
         self.startup_time = discord.utils.utcnow()
 
