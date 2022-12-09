@@ -26,7 +26,7 @@ setup(
     project_urls={'GitHub': 'https://github.com/TheMaster3558/veribot'},
     version=version,
     packages=packages,
-    description='VeriBot is a bot that can be used for verification.',
+    description='VeriBot is a cog that can be used for verification.',
     long_description=readme,
     long_description_content_type='text/x-rst',
     install_requires=requirements,
