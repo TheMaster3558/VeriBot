@@ -1,6 +1,6 @@
 VeriBot
 =======
-VeriBot is a bot that can be used for verification. This is important in servers such as school servers
+VeriBot is a cog that can be used for verification. This is important in servers such as school servers
 where you need to know who everyone is.
 
 
@@ -37,22 +37,37 @@ From their moderators have the option to accept or reject the user.
 After approval, moderators can view who a user is, rename the user, or unverify the user.
 
 
+Config
+------
+The bot must have an attribute ``config`` which is a dictionary with the keys of ``veribot_channel_id`` and ``veribot_verified_role_id``.
+
+
+App Commands
+------------
+The cog adds the app commands but does not sync them. **You** are responsible for syncing.
+
+
 Example
 -------
 .. code:: py
 
-    import veribot
-
-    bot = veribot.VeriBot(
-        channel_id=881609972469866527,  # this is the channel you can accept/reject from,
-        guild_id=878431847162466354,  # the id of the server the bot is being used in
-        verified_role_id=879147463020281907  # the id of the role to add to users that have been verified
-    )
-
-    bot.run('token')
+    import asyncio
+    import discord
+    from discord.ext import commands
 
 
-Final Note
-----------
-It is recommended to be familiar with discord.py before using this bot.
+    intents = discord.Intents.default()
+    intents.members = True
 
+    bot = commands.Bot(command_prefix=[], intents=intents)
+    bot.config = {'veribot_channel_id': 0, 'veribot_verified_role_id': 0}
+    # `veribot_channel_id` is the channel to accept/reject from
+    # `veribot_verified_role_id` is the role to add the a user if they get approved
+
+    async def main():
+        async with bot:
+            await bot.load_extension('veribot')
+            await bot.start('token')
+
+
+    asyncio.run(main())
